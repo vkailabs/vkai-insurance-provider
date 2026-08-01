@@ -35,23 +35,30 @@ export default function PremiumsPage() {
           <table className="table">
             <thead>
               <tr>
-                <th>Policy</th>
+                {/* The premium record has no plan name or "status"/"due date"
+                    (only the client policy it belongs to, plus paidAt). */}
+                <th>Policy ref</th>
                 <th>Amount</th>
-                <th>Status</th>
-                <th>Due date</th>
-                <th>Paid date</th>
+                <th>Paid at</th>
+                <th>Sync status</th>
               </tr>
             </thead>
             <tbody>
-              {premiums.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.policy_name || row.plan_name || row.policy_id || '—'}</td>
-                  <td>{formatCurrency(row.amount || row.premium_amount)}</td>
-                  <td>{row.status || '—'}</td>
-                  <td>{formatDate(row.due_date)}</td>
-                  <td>{formatDate(row.paid_at || row.paid_date)}</td>
-                </tr>
-              ))}
+              {premiums.map((row) => {
+                const policyRef = row.policy?.clientPolicyId || row.policyId;
+                return (
+                  <tr key={row.id}>
+                    <td>
+                      <code className="id-cell" title={policyRef}>
+                        {policyRef || '—'}
+                      </code>
+                    </td>
+                    <td>{formatCurrency(row.amount)}</td>
+                    <td>{formatDate(row.paidAt)}</td>
+                    <td>{row.syncStatus || '—'}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

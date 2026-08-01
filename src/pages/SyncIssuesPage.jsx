@@ -4,11 +4,39 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatDateTime } from '../utils/format';
 
-function toList(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.items)) return payload.items;
-  return [];
+// The API returns { counts, policies, premiums, claims } — each array holds the
+// records of that type whose sync_status is 'failed'. Flatten them into a single
+// tagged list for the table.
+//
+// Note: the records carry no sync-attempt timestamp, only a business timestamp
+// (enrolledAt / paidAt / submittedAt) and a syncAttempts counter — so those are
+// what we surface rather than inventing a "last attempt time".
+function flattenIssues(payload) {
+  if (!payload) return [];
+
+  const policies = (payload.policies || []).map((p) => ({
+    key: `policy-${p.id}`,
+    recordType: 'Policy',
+    businessId: p.clientPolicyId || p.id,
+    attempts: p.syncAttempts,
+    recordedAt: p.enrolledAt,
+  }));
+  const premiums = (payload.premiums || []).map((p) => ({
+    key: `premium-${p.id}`,
+    recordType: 'Premium',
+    businessId: p.eventId || p.id,
+    attempts: p.syncAttempts,
+    recordedAt: p.paidAt,
+  }));
+  const claims = (payload.claims || []).map((c) => ({
+    key: `claim-${c.id}`,
+    recordType: 'Claim',
+    businessId: c.clientClaimId || c.id,
+    attempts: c.syncAttempts,
+    recordedAt: c.submittedAt,
+  }));
+
+  return [...policies, ...premiums, ...claims];
 }
 
 export default function SyncIssuesPage() {
@@ -17,7 +45,8 @@ export default function SyncIssuesPage() {
   if (loading) return <LoadingSpinner label="Loading sync issues…" />;
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
-  const issues = toList(data);
+  const issues = flattenIssues(data);
+  const counts = data?.counts;
 
   return (
     <div className="page">
@@ -28,6 +57,13 @@ export default function SyncIssuesPage() {
         </button>
       </div>
 
+      {counts && (
+        <p className="muted sync-summary">
+          Failed syncs — Policies: {counts.policies} · Premiums:{' '}
+          {counts.premiums} · Claims: {counts.claims}
+        </p>
+      )}
+
       {issues.length === 0 ? (
         <p className="empty-state">No sync issues. 🎉</p>
       ) : (
@@ -37,17 +73,21 @@ export default function SyncIssuesPage() {
               <tr>
                 <th>Record type</th>
                 <th>Business ID</th>
-                <th>Last attempt</th>
-                <th>Attempts</th>
+                <th>Record date</th>
+                <th>Sync attempts</th>
               </tr>
             </thead>
             <tbody>
-              {issues.map((row, idx) => (
-                <tr key={row.id || idx}>
-                  <td>{row.record_type || row.type || '—'}</td>
-                  <td>{row.business_id || row.reference_id || '—'}</td>
-                  <td>{formatDateTime(row.last_attempt_at || row.last_attempt)}</td>
-                  <td>{row.attempt_count ?? row.attempts ?? '—'}</td>
+              {issues.map((row) => (
+                <tr key={row.key}>
+                  <td>{row.recordType}</td>
+                  <td>
+                    <code className="id-cell" title={row.businessId}>
+                      {row.businessId || '—'}
+                    </code>
+                  </td>
+                  <td>{formatDateTime(row.recordedAt)}</td>
+                  <td>{row.attempts ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

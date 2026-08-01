@@ -54,7 +54,7 @@ export default function EnrollmentsPage() {
           <table className="table">
             <thead>
               <tr>
-                <th>Policy holder</th>
+                <th>Client user ref</th>
                 <th>Plan</th>
                 <th>Premium</th>
                 <th>Requested</th>
@@ -64,10 +64,16 @@ export default function EnrollmentsPage() {
             <tbody>
               {enrollments.map((row) => (
                 <tr key={row.id}>
-                  <td>{row.policy_holder_name || row.member_name || row.user_email || '—'}</td>
-                  <td>{row.plan_name || row.policy_name || '—'}</td>
-                  <td>{formatCurrency(row.premium_amount)}</td>
-                  <td>{formatDate(row.created_at || row.requested_at)}</td>
+                  <td>
+                    {/* Only identifier the API has — an opaque Firebase UID
+                        from the client side, not a real name. */}
+                    <code className="id-cell" title={row.clientUserRef}>
+                      {row.clientUserRef || '—'}
+                    </code>
+                  </td>
+                  <td>{row.policyCatalog?.name || '—'}</td>
+                  <td>{formatCurrency(row.policyCatalog?.premiumAmount)}</td>
+                  <td>{formatDate(row.enrolledAt)}</td>
                   <td className="table__actions-col">
                     <RoleGate
                       approver

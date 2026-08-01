@@ -106,7 +106,7 @@ export default function ClaimsPage() {
               <div key={claim.id} className="card claim-card">
                 <div className="claim-card__head">
                   <span className="claim-card__amount">
-                    {formatCurrency(claim.amount)}
+                    {formatCurrency(claim.amountClaimed)}
                   </span>
                   <ClaimStatusBadge status={status} />
                 </div>
@@ -116,7 +116,7 @@ export default function ClaimsPage() {
                 </p>
 
                 <p className="claim-card__date muted">
-                  Submitted {formatDate(claim.created_at || claim.submitted_at)}
+                  Submitted {formatDate(claim.submittedAt)}
                 </p>
 
                 <div className="claim-card__actions">

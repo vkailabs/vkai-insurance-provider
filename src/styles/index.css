@@ -490,6 +490,21 @@ body {
   text-align: right;
   white-space: nowrap;
 }
+.id-cell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.sync-summary {
+  margin: -0.25rem 0 1rem;
+  font-size: 0.9rem;
+}
 
 /* ---- Loading / error ---- */
 .loading-spinner {
