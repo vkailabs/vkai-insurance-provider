@@ -44,7 +44,12 @@ export default function DashboardPage() {
   const [enrollmentsRaw, claimsRaw, syncRaw] = data;
   const enrollments = toList(enrollmentsRaw);
   const claims = toList(claimsRaw);
-  const syncIssues = toList(syncRaw);
+  // The sync-issues endpoint returns { counts, policies, premiums, claims },
+  // not an array — total the per-type failed-sync counts.
+  const syncCounts = syncRaw?.counts;
+  const syncIssuesCount = syncCounts
+    ? syncCounts.policies + syncCounts.premiums + syncCounts.claims
+    : 0;
 
   const claimCounts = CLAIM_STATUSES.reduce((acc, status) => {
     acc[status] = claims.filter((c) => c.status === status).length;
@@ -72,7 +77,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link to="/sync-issues" className="stat-card stat-card--warn">
-          <span className="stat-card__value">{syncIssues.length}</span>
+          <span className="stat-card__value">{syncIssuesCount}</span>
           <span className="stat-card__label">Sync issues</span>
         </Link>
       </div>
