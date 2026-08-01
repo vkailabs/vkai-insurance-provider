@@ -1,0 +1,545 @@
+/* ---- VKAI Insurance Provider Portal ----
+   Accent: teal (distinct from the client site, which uses a different color),
+   so it's obvious which app is which when both are on screen during a demo. */
+
+:root {
+  --accent: #0f766e;
+  --accent-dark: #0b5952;
+  --accent-light: #ccfbf1;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+
+  /* Claim status colors */
+  --status-submitted: #64748b;
+  --status-review: #b45309;
+  --status-approved: #15803d;
+  --status-rejected: #b91c1c;
+  --status-paid: #6d28d9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn--sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+}
+.btn--block {
+  width: 100%;
+}
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-dark);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: #f8fafc;
+}
+.btn--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: #fecaca;
+}
+.btn--danger:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+/* ---- Login ---- */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  padding: 1rem;
+}
+.login-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.login-card__logo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+}
+.login-card__subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.login-card__error {
+  margin-top: 1rem;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+/* ---- App shell / nav ---- */
+.app-shell {
+  min-height: 100vh;
+}
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 3px solid var(--accent);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+}
+.navbar__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navbar__title {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+.navbar__links {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.navbar__link {
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.navbar__link:hover {
+  background: #f1f5f9;
+  color: var(--text);
+}
+.navbar__link--active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.navbar__user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+.navbar__user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- Role badge ---- */
+.role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+.role-badge--approver {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+.role-badge--reviewer {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.role-badge--none {
+  background: #f1f5f9;
+  color: var(--text-muted);
+}
+
+/* ---- Page layout ---- */
+.app-main {
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.page__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.page__subtitle {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.05rem;
+}
+.page__controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.muted {
+  color: var(--text-muted);
+}
+.empty-state {
+  color: var(--text-muted);
+  padding: 2rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+/* ---- Stat cards ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.stat-grid--compact {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.stat-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+.stat-card--small {
+  padding: 1rem;
+}
+.stat-card--warn {
+  border-left: 4px solid #b45309;
+}
+.stat-card__value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-dark);
+  line-height: 1;
+}
+.stat-card--small .stat-card__value {
+  font-size: 1.5rem;
+}
+.stat-card__label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---- Cards / grid ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* ---- Plan card ---- */
+.plan-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.plan-card__name {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+.plan-card__desc {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.plan-card__meta {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0 0 1rem;
+}
+.plan-card__meta dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.plan-card__meta dd {
+  margin: 0.1rem 0 0;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.plan-card__actions,
+.claim-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ---- Claim card ---- */
+.claim-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.claim-card__amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.claim-card__desc {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+.claim-card__date {
+  margin: 0 0 0.9rem;
+  font-size: 0.8rem;
+}
+
+/* ---- Status badge ---- */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+.badge--submitted {
+  background: var(--status-submitted);
+}
+.badge--under-review {
+  background: var(--status-review);
+}
+.badge--approved {
+  background: var(--status-approved);
+}
+.badge--rejected {
+  background: var(--status-rejected);
+}
+.badge--paid {
+  background: var(--status-paid);
+}
+.badge--default {
+  background: #94a3b8;
+}
+
+/* ---- Forms ---- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.9rem;
+}
+.field--inline {
+  margin-bottom: 0;
+}
+.field__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.field__input {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: #fff;
+}
+.field__input:focus {
+  outline: 2px solid var(--accent-light);
+  border-color: var(--accent);
+}
+.field-row {
+  display: flex;
+  gap: 1rem;
+}
+.field-row .field {
+  flex: 1;
+}
+.plan-form {
+  margin-bottom: 1.25rem;
+}
+.plan-form__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- Table ---- */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.table th {
+  background: #f8fafc;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+.table__actions-col {
+  text-align: right;
+  white-space: nowrap;
+}
+.id-cell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.sync-summary {
+  margin: -0.25rem 0 1rem;
+  font-size: 0.9rem;
+}
+
+/* ---- Loading / error ---- */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+.loading-spinner__dot {
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--accent-light);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.error-message {
+  background: var(--danger-bg);
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.error-message__text {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
