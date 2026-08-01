@@ -34,11 +34,12 @@ function PlanForm({ initial, onCancel, onSubmit }) {
     setBusy(true);
     setError(null);
     try {
+      // Provider API expects camelCase field names (see API src/routes/policyCatalog.js).
       await onSubmit({
         name: form.name,
         description: form.description,
-        premium_amount: Number(form.premium_amount),
-        coverage_amount: Number(form.coverage_amount),
+        premiumAmount: Number(form.premium_amount),
+        coverageAmount: Number(form.coverage_amount),
       });
     } catch (err) {
       setError(err?.message || 'Save failed.');
@@ -137,7 +138,7 @@ export default function CatalogPage() {
   };
 
   const handleDeactivate = async (plan) => {
-    await updatePolicy(plan.id, { is_active: false });
+    await updatePolicy(plan.id, { isActive: false });
     refetch();
   };
 
@@ -173,8 +174,8 @@ export default function CatalogPage() {
                   initial={{
                     name: plan.name ?? '',
                     description: plan.description ?? '',
-                    premium_amount: plan.premium_amount ?? '',
-                    coverage_amount: plan.coverage_amount ?? '',
+                    premium_amount: plan.premiumAmount ?? '',
+                    coverage_amount: plan.coverageAmount ?? '',
                   }}
                   onCancel={() => setEditing(null)}
                   onSubmit={handleUpdate(plan.id)}
@@ -183,7 +184,7 @@ export default function CatalogPage() {
                 <>
                   <div className="plan-card__head">
                     <h3 className="plan-card__name">{plan.name}</h3>
-                    {plan.is_active === false && (
+                    {plan.isActive === false && (
                       <span className="badge badge--rejected">Inactive</span>
                     )}
                   </div>
@@ -191,11 +192,11 @@ export default function CatalogPage() {
                   <dl className="plan-card__meta">
                     <div>
                       <dt>Premium</dt>
-                      <dd>{formatCurrency(plan.premium_amount)}</dd>
+                      <dd>{formatCurrency(plan.premiumAmount)}</dd>
                     </div>
                     <div>
                       <dt>Coverage</dt>
-                      <dd>{formatCurrency(plan.coverage_amount)}</dd>
+                      <dd>{formatCurrency(plan.coverageAmount)}</dd>
                     </div>
                   </dl>
 
@@ -208,7 +209,7 @@ export default function CatalogPage() {
                       >
                         Edit
                       </button>
-                      {plan.is_active !== false && (
+                      {plan.isActive !== false && (
                         <button
                           type="button"
                           className="btn btn--danger"
