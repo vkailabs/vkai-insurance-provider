@@ -17,17 +17,6 @@ export default function LoginPage() {
     inProgress === InteractionStatus.Startup ||
     inProgress === InteractionStatus.HandleRedirect;
 
-  // TEMP DIAGNOSTIC (remove once redirect login is fixed): log routing inputs on
-  // every render so we can see whether/when the /dashboard navigation fires.
-  // eslint-disable-next-line no-console
-  console.log(`[MSAL-DIAG ${new Date().toISOString()}] LoginPage render`, {
-    inProgress,
-    isAuthenticated,
-    settling,
-    path: window.location.pathname,
-    hash: window.location.hash,
-  });
-
   // If already signed in, skip the landing page — but only once MSAL has
   // finished any in-flight redirect processing, so we don't act on a transient
   // isAuthenticated=false (or navigate before the account is ready).
