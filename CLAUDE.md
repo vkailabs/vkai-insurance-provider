@@ -60,6 +60,18 @@ If you touch auth/routing, understand all three points above first. Do not colla
   is unchanged). **Preserve this** when touching NavBar or its CSS — don't regress the
   mobile menu or alter the desktop layout.
 
+## Catalog plan "key"
+
+- The `key` on a catalog plan is generated and made **unique server-side by the provider
+  API**. The frontend **never generates or edits it** — it only displays what the API
+  returns. The Key field is rendered **read-only/locked**.
+- Because the key only exists **after save**, the **Add Plan form stays open on save**,
+  reveals the returned `key` in the locked field, and swaps the **Save** button for
+  **"Done"** (a placeholder text is shown in the Key field pre-save). **Preserve this flow**
+  if the form is refactored.
+- The catalog list renders `key` as a **prefix to the name** (`PG2 - Premium Gold 2024`),
+  falling back to just the name if `key` is absent.
+
 ## Deployment
 
 - Deployed to **Vercel**. `vercel.json` contains an **SPA rewrite rule** (serves
