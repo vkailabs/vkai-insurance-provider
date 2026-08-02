@@ -16,10 +16,9 @@ export default function NavBar() {
   const { name, username, role } = useAuth();
 
   const handleLogout = () => {
-    instance.logoutPopup({ postLogoutRedirectUri: '/login' }).catch(() => {
-      // Popup blocked or cancelled — fall back to redirect logout.
-      instance.logoutRedirect();
-    });
+    // Redirect (not popup) for consistency with the login flow and to avoid the
+    // same popup unreliability on mobile Safari.
+    instance.logoutRedirect({ postLogoutRedirectUri: '/login' });
   };
 
   return (
