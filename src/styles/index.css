@@ -427,6 +427,11 @@ body {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
 }
+.plan-card__key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  color: var(--accent, #2563eb);
+}
 .plan-card__desc {
   margin: 0 0 1rem;
   color: var(--text-muted);
@@ -530,6 +535,14 @@ body {
   outline: 2px solid var(--accent-light);
   border-color: var(--accent);
 }
+/* Read-only, server-generated value (e.g. the catalog plan key). */
+.field__input--locked {
+  background: var(--surface-muted, #f1f5f9);
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.02em;
+  cursor: not-allowed;
+}
 .field-row {
   display: flex;
   gap: 1rem;
@@ -539,6 +552,11 @@ body {
 }
 .plan-form {
   margin-bottom: 1.25rem;
+}
+.plan-form__note {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 .plan-form__actions {
   display: flex;
