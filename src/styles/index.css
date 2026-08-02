@@ -507,6 +507,12 @@ body {
 }
 
 /* ---- Loading / error ---- */
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .loading-spinner {
   display: flex;
   align-items: center;

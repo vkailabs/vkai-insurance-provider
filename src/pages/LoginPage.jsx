@@ -1,22 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal, useIsAuthenticated } from '@azure/msal-react';
+import { InteractionStatus } from '@azure/msal-browser';
 import { useEffect } from 'react';
 import { loginRequest } from '../authConfig';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function LoginPage() {
-  const { instance } = useMsal();
+  const { instance, inProgress } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  // If already signed in, skip the landing page.
+  const settling =
+    inProgress === InteractionStatus.Startup ||
+    inProgress === InteractionStatus.HandleRedirect;
+
+  // If already signed in, skip the landing page — but only once MSAL has
+  // finished any in-flight redirect processing, so we don't act on a transient
+  // isAuthenticated=false (or navigate before the account is ready).
   useEffect(() => {
-    if (isAuthenticated) {
+    if (inProgress === InteractionStatus.None && isAuthenticated) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [inProgress, isAuthenticated, navigate]);
 
   const handleLogin = async () => {
     setBusy(true);
@@ -36,6 +44,16 @@ export default function LoginPage() {
       setBusy(false);
     }
   };
+
+  // While MSAL is settling a redirect, show a spinner rather than flashing the
+  // sign-in card (the redirect may resolve into an authenticated session).
+  if (settling) {
+    return (
+      <div className="app-loading">
+        <LoadingSpinner label="Signing you in…" />
+      </div>
+    );
+  }
 
   return (
     <div className="login-page">
