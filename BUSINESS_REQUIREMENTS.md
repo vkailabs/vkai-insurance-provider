@@ -59,6 +59,14 @@ coverage amount). The catalog is the **source of truth** for plans: the client (
 - **Both roles:** view plans.
 - **Approver only:** add, edit, and deactivate plans.
 
+Every catalog entry has an auto-generated, **locked "key"**. The key is the first character
+of each whitespace-separated token of the plan name, uppercased (e.g. `Premium Gold 2024`
+→ `PG2`), with a `-2` / `-3` … suffix appended on collision so keys stay unique. The key is
+**generated after the plan is saved** — it is not chosen by the user. On the **Add Plan**
+screen the Key field appears **below Name**, is **non-editable**, and is populated once the
+plan has been saved. In the catalog list the key is shown as a **prefix to the plan name**
+(e.g. `PG2 - Premium Gold 2024`).
+
 ### Enrollments
 
 The **pending-enrollment queue** — enrollment requests that have synced in from the client
