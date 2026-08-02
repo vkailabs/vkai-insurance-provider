@@ -10,6 +10,16 @@ export default function ProtectedRoute() {
   const { inProgress } = useMsal();
   const isAuthenticated = useIsAuthenticated();
 
+  // TEMP DIAGNOSTIC (remove once redirect login is fixed): log routing inputs on
+  // every render so we can see what decision this makes during redirect return.
+  // eslint-disable-next-line no-console
+  console.log(`[MSAL-DIAG ${new Date().toISOString()}] ProtectedRoute render`, {
+    inProgress,
+    isAuthenticated,
+    path: window.location.pathname,
+    hash: window.location.hash,
+  });
+
   // While MSAL is still starting up or processing the redirect response,
   // isAuthenticated may transiently be false. Wait — don't bounce to /login
   // mid-flight — until interaction has settled to None.
