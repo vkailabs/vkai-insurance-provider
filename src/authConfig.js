@@ -9,10 +9,14 @@ export const msalConfig = {
   auth: {
     clientId,
     authority: `https://login.microsoftonline.com/${tenantId}`,
-    // Resolve at runtime so login works on any origin — http://localhost:5174
-    // locally and the deployed domain in production — with no per-env config.
-    // (Each origin must still be registered as a redirect URI in Entra ID.)
-    redirectUri: window.location.origin,
+    // Dedicated callback path that no other route navigates away from, so MSAL's
+    // handleRedirectPromise can read the #code=... response hash before any
+    // client-side routing strips it. Resolves at runtime so it works on any
+    // origin (localhost:5174 and the deployed domain) with no per-env config.
+    // (Each origin's /auth/callback must be registered as a redirect URI in
+    // Entra ID.)
+    redirectUri: `${window.location.origin}/auth/callback`,
+    // Logout has no response hash to consume, so the bare origin is fine here.
     postLogoutRedirectUri: window.location.origin,
   },
   cache: {
