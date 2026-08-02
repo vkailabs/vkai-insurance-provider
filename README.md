@@ -14,10 +14,12 @@ enrollments, claims, premiums, and sync issues. It authenticates ops users with
 
 ## Tech stack
 
-- React + Vite (dev server on **port 5174**, matching the registered redirect URI)
+- React + Vite (dev server on **port 5174**, matching the registered redirect origin)
 - React Router
-- `@azure/msal-browser` + `@azure/msal-react` for Entra ID auth
+- `@azure/msal-browser` + `@azure/msal-react` for Entra ID auth (redirect flow via a
+  dedicated `/auth/callback` route)
 - Lightweight `fetch`-based API client
+- Deployed to **Vercel** (SPA rewrites via `vercel.json`)
 
 ## Prerequisites
 
@@ -50,8 +52,13 @@ commit real config):
 npm run dev
 ```
 
-Then open <http://localhost:5174>. Sign in with Microsoft (a popup login flow),
-and you'll land on the dashboard.
+Then open <http://localhost:5174>. Sign in with Microsoft — a full-page **redirect**
+flow that returns to `/auth/callback` and then lands you on the dashboard.
+
+> The Entra ID app registration must list `http://localhost:5174/auth/callback` (and the
+> deployed `https://<domain>/auth/callback`) as SPA redirect URIs. The `redirectUri` is
+> built at runtime from `window.location.origin` — see [CLAUDE.md](CLAUDE.md) for why the
+> flow is structured this way and must not be changed back to popup / bare-origin.
 
 Other scripts:
 
@@ -63,8 +70,8 @@ npm run preview   # preview the production build
 ## Auth & roles
 
 - On login the app requests the `api://<clientId>/access_as_user` scope, then
-  acquires an access token silently (falling back to a popup) before each API
-  call. The token is attached as a `Bearer` header automatically.
+  acquires an access token silently (falling back to a full-page **redirect**) before
+  each API call. The token is attached as a `Bearer` header automatically.
 - Roles are derived on the frontend from the ID token's `groups` claim:
   - In the **Approver** group → **Approver**
   - In the **Reviewer** group only → **Reviewer**
@@ -76,7 +83,8 @@ npm run preview   # preview the production build
 
 | Route | Description | Roles |
 | --- | --- | --- |
-| `/login` | Sign in with Microsoft | — |
+| `/login` | Sign in with Microsoft (redirect flow) | — |
+| `/auth/callback` | MSAL redirect landing; processes the response, then routes on | — |
 | `/dashboard` | Summary counts (pending enrollments, claims by status, sync issues) | Reviewer / Approver |
 | `/catalog` | Policy catalog; add / edit / deactivate plans | View: both · Edit: Approver |
 | `/enrollments` | Pending enrollments; activate | Activate: Approver |
