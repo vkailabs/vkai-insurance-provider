@@ -13,6 +13,17 @@ function toList(payload) {
   return [];
 }
 
+// The create/update endpoints return the plan object, sometimes wrapped in a
+// `data` envelope (mirrors the list unwrapping in toList). Normalize to the
+// bare plan object so we can read the server-generated `key`.
+function toPlan(payload) {
+  if (payload && !Array.isArray(payload) && typeof payload === 'object') {
+    if (payload.data && !Array.isArray(payload.data)) return payload.data;
+    return payload;
+  }
+  return null;
+}
+
 const EMPTY_FORM = {
   name: '',
   description: '',
@@ -21,10 +32,19 @@ const EMPTY_FORM = {
 };
 
 // Inline form used for both "Add plan" and "Edit plan".
+// `onSubmit` resolves with the saved plan object (which includes the
+// server-generated `key`). The Key field is always read-only — it is generated
+// and kept unique server-side; the frontend only displays it.
 function PlanForm({ initial, onCancel, onSubmit }) {
   const [form, setForm] = useState(initial || EMPTY_FORM);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  // On "Add plan" the key does not exist until the API creates the plan, so it
+  // starts empty and is filled in from the create response after Save.
+  const [planKey, setPlanKey] = useState(initial?.key ?? '');
+  const [saved, setSaved] = useState(false);
+
+  const isEdit = Boolean(initial);
 
   const update = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -35,12 +55,20 @@ function PlanForm({ initial, onCancel, onSubmit }) {
     setError(null);
     try {
       // Provider API expects camelCase field names (see API src/routes/policyCatalog.js).
-      await onSubmit({
+      const result = await onSubmit({
         name: form.name,
         description: form.description,
         premiumAmount: Number(form.premium_amount),
         coverageAmount: Number(form.coverage_amount),
       });
+      if (!isEdit) {
+        // Create: reveal the server-generated key and keep the form open so the
+        // user sees it. (Edit closes immediately — the parent unmounts us.)
+        const savedPlan = toPlan(result);
+        if (savedPlan?.key) setPlanKey(savedPlan.key);
+        setSaved(true);
+        setBusy(false);
+      }
     } catch (err) {
       setError(err?.message || 'Save failed.');
       setBusy(false);
@@ -55,7 +83,24 @@ function PlanForm({ initial, onCancel, onSubmit }) {
           className="field__input"
           value={form.name}
           onChange={update('name')}
+          disabled={saved}
           required
+        />
+      </label>
+
+      {/* Read-only, server-generated key. Rendered below Name. On "Add plan"
+          it is empty (with a hint) until the create response returns it. */}
+      <label className="field">
+        <span className="field__label">Key</span>
+        <input
+          className="field__input field__input--locked"
+          value={planKey}
+          placeholder={
+            isEdit ? '—' : 'Generated automatically after you save'
+          }
+          readOnly
+          disabled
+          aria-readonly="true"
         />
       </label>
 
@@ -65,6 +110,7 @@ function PlanForm({ initial, onCancel, onSubmit }) {
           className="field__input"
           value={form.description}
           onChange={update('description')}
+          disabled={saved}
           rows={2}
         />
       </label>
@@ -79,6 +125,7 @@ function PlanForm({ initial, onCancel, onSubmit }) {
             step="0.01"
             value={form.premium_amount}
             onChange={update('premium_amount')}
+            disabled={saved}
             required
           />
         </label>
@@ -92,6 +139,7 @@ function PlanForm({ initial, onCancel, onSubmit }) {
             step="0.01"
             value={form.coverage_amount}
             onChange={update('coverage_amount')}
+            disabled={saved}
             required
           />
         </label>
@@ -99,18 +147,43 @@ function PlanForm({ initial, onCancel, onSubmit }) {
 
       {error && <p className="error-message__text">⚠ {error}</p>}
 
+      {saved && !isEdit && (
+        <p className="plan-form__note">
+          Plan saved. Its key <strong>{planKey || '—'}</strong> was assigned
+          automatically and cannot be edited.
+        </p>
+      )}
+
       <div className="plan-form__actions">
-        <button type="submit" className="btn btn--primary" disabled={busy}>
-          {busy ? 'Saving…' : 'Save plan'}
-        </button>
-        <button
-          type="button"
-          className="btn btn--ghost"
-          onClick={onCancel}
-          disabled={busy}
-        >
-          Cancel
-        </button>
+        {saved ? (
+          // After a successful save the plan (and its server-generated key)
+          // exists; there is nothing more to submit, so just let the user close.
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={onCancel}
+          >
+            Done
+          </button>
+        ) : (
+          <>
+            <button
+              type="submit"
+              className="btn btn--primary"
+              disabled={busy}
+            >
+              {busy ? 'Saving…' : 'Save plan'}
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={onCancel}
+              disabled={busy}
+            >
+              Cancel
+            </button>
+          </>
+        )}
       </div>
     </form>
   );
@@ -126,9 +199,12 @@ export default function CatalogPage() {
   const plans = toList(data);
 
   const handleCreate = async (payload) => {
-    await createPolicy(payload);
-    setEditing(null);
+    // Do NOT close the form here: the form reveals the server-generated key
+    // (returned in the create response) and the user closes it via "Done".
+    // Refetch so the new plan appears in the list behind the form.
+    const created = await createPolicy(payload);
     refetch();
+    return created;
   };
 
   const handleUpdate = (id) => async (payload) => {
@@ -176,6 +252,7 @@ export default function CatalogPage() {
                     description: plan.description ?? '',
                     premium_amount: plan.premiumAmount ?? '',
                     coverage_amount: plan.coverageAmount ?? '',
+                    key: plan.key ?? '',
                   }}
                   onCancel={() => setEditing(null)}
                   onSubmit={handleUpdate(plan.id)}
@@ -183,7 +260,12 @@ export default function CatalogPage() {
               ) : (
                 <>
                   <div className="plan-card__head">
-                    <h3 className="plan-card__name">{plan.name}</h3>
+                    <h3 className="plan-card__name">
+                      {plan.key && (
+                        <span className="plan-card__key">{plan.key}</span>
+                      )}
+                      {plan.key ? ` - ${plan.name}` : plan.name}
+                    </h3>
                     {plan.isActive === false && (
                       <span className="badge badge--rejected">Inactive</span>
                     )}
