@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../auth/AuthContext';
@@ -14,6 +15,11 @@ const NAV_LINKS = [
 export default function NavBar() {
   const { instance } = useMsal();
   const { name, username, role } = useAuth();
+  // Mobile menu open/closed. Ignored above the 768px breakpoint (the menu is
+  // always shown inline there via `display: contents`).
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
     // Redirect (not popup) for consistency with the login flow and to avoid the
@@ -28,34 +34,57 @@ export default function NavBar() {
         <span className="navbar__title">Insurance Provider Portal</span>
       </div>
 
-      <nav className="navbar__links">
-        {NAV_LINKS.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              `navbar__link${isActive ? ' navbar__link--active' : ''}`
-            }
-          >
-            {link.label}
-          </NavLink>
-        ))}
-      </nav>
+      {/* Hamburger — visible only below the mobile breakpoint (CSS-controlled). */}
+      <button
+        type="button"
+        className="navbar__toggle"
+        aria-label="Toggle navigation menu"
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        <span className="navbar__toggle-bar" />
+        <span className="navbar__toggle-bar" />
+        <span className="navbar__toggle-bar" />
+      </button>
 
-      <div className="navbar__user">
-        <div className="navbar__user-info">
-          <span className="navbar__user-name">{name || username}</span>
-          {role ? (
-            <span className={`role-badge role-badge--${role.toLowerCase()}`}>
-              {role}
-            </span>
-          ) : (
-            <span className="role-badge role-badge--none">No role</span>
-          )}
+      <div className={`navbar__menu${menuOpen ? ' navbar__menu--open' : ''}`}>
+        <nav className="navbar__links">
+          {NAV_LINKS.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                `navbar__link${isActive ? ' navbar__link--active' : ''}`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="navbar__user">
+          <div className="navbar__user-info">
+            <span className="navbar__user-name">{name || username}</span>
+            {role ? (
+              <span className={`role-badge role-badge--${role.toLowerCase()}`}>
+                {role}
+              </span>
+            ) : (
+              <span className="role-badge role-badge--none">No role</span>
+            )}
+          </div>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => {
+              closeMenu();
+              handleLogout();
+            }}
+          >
+            Logout
+          </button>
         </div>
-        <button type="button" className="btn btn--ghost" onClick={handleLogout}>
-          Logout
-        </button>
       </div>
     </header>
   );

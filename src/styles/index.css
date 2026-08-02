@@ -209,6 +209,94 @@ body {
   white-space: nowrap;
 }
 
+/* ---- Responsive nav ----
+   Desktop (>= 768px): the menu wrapper is transparent to layout via
+   `display: contents`, so brand | links | user render exactly as before, and
+   the hamburger is hidden. All collapsing behavior lives in the media query. */
+.navbar__menu {
+  display: contents;
+}
+.navbar__toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .navbar {
+    /* Let the absolutely-positioned dropdown anchor to the bar; keep a clean
+       single-row bar so nav links can't overflow into page content. */
+    gap: 0.75rem;
+    position: sticky; /* unchanged, but explicit: dropdown anchors here */
+  }
+  .navbar__title {
+    font-size: 0.9rem;
+  }
+
+  /* Hamburger button */
+  .navbar__toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    margin-left: auto; /* push to the right edge of the bar */
+    width: 40px;
+    height: 40px;
+    padding: 0 9px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .navbar__toggle-bar {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--text);
+    border-radius: 2px;
+  }
+
+  /* Collapsed dropdown panel */
+  .navbar__menu {
+    display: none;
+  }
+  .navbar__menu--open {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-bottom: 3px solid var(--accent);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    padding: 0.75rem 1rem 1rem;
+    z-index: 20; /* above sticky bar (z-index: 10) and page content */
+  }
+
+  .navbar__menu--open .navbar__links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    flex: none;
+  }
+  .navbar__menu--open .navbar__link {
+    padding: 0.6rem 0.7rem;
+  }
+
+  .navbar__menu--open .navbar__user {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .navbar__menu--open .navbar__user-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
 /* ---- Role badge ---- */
 .role-badge {
   font-size: 0.7rem;
