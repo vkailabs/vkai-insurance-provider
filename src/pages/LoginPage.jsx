@@ -22,14 +22,17 @@ export default function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      const result = await instance.loginPopup(loginRequest);
-      if (result?.account) {
-        instance.setActiveAccount(result.account);
-      }
-      navigate('/dashboard', { replace: true });
+      // Redirect flow instead of a popup: popups break on mobile Safari because
+      // React Router intercepts the auth-response hash inside the popup window
+      // before MSAL can read it (BrowserAuthError "hash_empty_error").
+      // loginRedirect navigates the whole page to Microsoft and back; on return,
+      // MsalProvider processes the response (it calls handleRedirectPromise
+      // automatically) and the useEffect above routes the now-authenticated user
+      // to /dashboard. On success the page redirects away, so we leave `busy`
+      // set; only reset it if initiating the redirect fails.
+      await instance.loginRedirect(loginRequest);
     } catch (err) {
       setError(err?.message || 'Sign-in failed.');
-    } finally {
       setBusy(false);
     }
   };

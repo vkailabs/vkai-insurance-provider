@@ -4,8 +4,8 @@ import { loginRequest } from '../authConfig';
 
 const baseUrl = import.meta.env.VITE_VKAI_INSURANCE_PROVIDER_API_BASE_URL;
 
-// Acquire an access token for the provider API. Try silently first, then fall
-// back to an interactive popup if MSAL needs user interaction.
+// Acquire an access token for the provider API. Try silently first (the common
+// path); if MSAL needs user interaction, fall back to a full-page redirect.
 async function getAccessToken() {
   const account =
     msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0];
@@ -21,8 +21,13 @@ async function getAccessToken() {
     return result.accessToken;
   } catch (err) {
     if (err instanceof InteractionRequiredAuthError) {
-      const result = await msalInstance.acquireTokenPopup(request);
-      return result.accessToken;
+      // Interactive fallback uses a redirect rather than a popup, to stay
+      // consistent with the login flow and because popups break on mobile
+      // Safari (see LoginPage). This navigates away and abandons the current
+      // request; the user re-authenticates and returns to the app.
+      await msalInstance.acquireTokenRedirect(request);
+      // Page is redirecting — unreachable on success.
+      throw new Error('Redirecting for authentication…');
     }
     throw err;
   }
