@@ -9,8 +9,11 @@ export const msalConfig = {
   auth: {
     clientId,
     authority: `https://login.microsoftonline.com/${tenantId}`,
-    redirectUri: 'http://localhost:5174',
-    postLogoutRedirectUri: 'http://localhost:5174',
+    // Resolve at runtime so login works on any origin — http://localhost:5174
+    // locally and the deployed domain in production — with no per-env config.
+    // (Each origin must still be registered as a redirect URI in Entra ID.)
+    redirectUri: window.location.origin,
+    postLogoutRedirectUri: window.location.origin,
   },
   cache: {
     // sessionStorage keeps tokens per-tab, which is fine for a local demo.
