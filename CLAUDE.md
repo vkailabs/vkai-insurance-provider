@@ -5,6 +5,14 @@ Vite SPA, Entra ID (Azure AD) auth via MSAL, talks to `vkai-insurance-provider-a
 See [BUSINESS_REQUIREMENTS.md](BUSINESS_REQUIREMENTS.md) for domain/roles and
 [README.md](README.md) for setup.
 
+## Documentation
+
+- **Keep documentation current.** If a change is significant (new field, new business rule,
+  new architectural decision, new infrastructure/pipeline, or a newly discovered gotcha),
+  update this repo's own [BUSINESS_REQUIREMENTS.md](BUSINESS_REQUIREMENTS.md) and/or
+  [README.md](README.md) as part of the **same commit**, not as a separate afterthought.
+  Minor or purely cosmetic changes don't need a doc update.
+
 ## Naming conventions
 
 - Env vars are prefixed:
