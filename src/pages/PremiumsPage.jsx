@@ -35,8 +35,11 @@ export default function PremiumsPage() {
           <table className="table">
             <thead>
               <tr>
-                {/* The premium record has no plan name or "status"/"due date"
-                    (only the client policy it belongs to, plus paidAt). */}
+                {/* Policy Name comes from the API's resolved plan catalog name
+                    (policyName); falls back to "Unknown plan" when null/blank.
+                    The premium record itself carries no plan name — only the
+                    client policy it belongs to, plus paidAt. */}
+                <th>Policy Name</th>
                 <th>Policy ref</th>
                 <th>Amount</th>
                 <th>Paid at</th>
@@ -46,8 +49,13 @@ export default function PremiumsPage() {
             <tbody>
               {premiums.map((row) => {
                 const policyRef = row.policy?.clientPolicyId || row.policyId;
+                const policyName =
+                  typeof row.policyName === 'string' && row.policyName.trim()
+                    ? row.policyName
+                    : 'Unknown plan';
                 return (
                   <tr key={row.id}>
+                    <td>{policyName}</td>
                     <td>
                       <code className="id-cell" title={policyRef}>
                         {policyRef || '—'}
