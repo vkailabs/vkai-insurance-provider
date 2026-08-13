@@ -98,6 +98,12 @@ requirement. Each transition is synced back to the client side.
 **View-only** payment history. No actions — ops staff can see premium payments that have
 been recorded but do not modify them here.
 
+The premiums table's **first (left-most) column is "Policy Name"**, populated from the API's
+`policyName` field on each premium (the resolved plan catalog name). When `policyName` is
+`null`, absent, or blank, the cell renders the literal text **"Unknown plan"** — the
+frontend never fabricates or derives a plan name. The remaining columns (Policy ref, Amount,
+Paid at, Sync status) follow unchanged.
+
 ### Sync Issues
 
 Visibility into cross-cloud syncs that have **permanently failed**. Because the provider and
