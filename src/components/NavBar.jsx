@@ -30,8 +30,8 @@ export default function NavBar() {
   return (
     <header className="navbar">
       <div className="navbar__brand">
-        <span className="navbar__logo">VK</span>
-        <span className="navbar__title">Insurance Provider Portal</span>
+        <span className="navbar__logo">VK AI Labs</span>
+        <span className="navbar__title">Provider Portal</span>
       </div>
 
       {/* Hamburger — visible only below the mobile breakpoint (CSS-controlled). */}
