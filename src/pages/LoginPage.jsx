@@ -58,8 +58,8 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-card__logo">VK</div>
-        <h1 className="login-card__title">Insurance Provider Portal</h1>
+        <div className="login-card__logo">VK AI Labs</div>
+        <h1 className="login-card__title">Provider Portal</h1>
         <p className="login-card__subtitle">
           Ops console for enrollments, claims &amp; premiums.
         </p>
