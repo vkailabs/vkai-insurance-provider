@@ -102,8 +102,17 @@ export default function ClaimsPage() {
           {claims.map((claim) => {
             const busy = actingId === claim.id;
             const status = claim.status;
+            // Policy Name comes from the API's resolved plan catalog name
+            // (policyName); falls back to "Unknown plan" when null/absent/blank.
+            // Mirrors the Premiums view — the frontend never fabricates a name.
+            const policyName =
+              typeof claim.policyName === 'string' && claim.policyName.trim()
+                ? claim.policyName
+                : 'Unknown plan';
             return (
               <div key={claim.id} className="card claim-card">
+                <h2 className="claim-card__policy">{policyName}</h2>
+
                 <div className="claim-card__head">
                   <span className="claim-card__amount">
                     {formatCurrency(claim.amountClaimed)}
