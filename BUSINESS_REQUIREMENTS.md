@@ -93,6 +93,13 @@ The gating is **flexible**: an Approver may approve or reject a claim directly w
 Reviewer having moved it to Under Review first — there is no strict Reviewer-first
 requirement. Each transition is synced back to the client side.
 
+Each claim is shown as a **card**, and the **top line (heading) of every claim card is the
+Policy Name**, populated from the API's `policyName` field on each claim (the resolved plan
+catalog name). When `policyName` is `null`, absent, or blank, the heading renders the literal
+text **"Unknown plan"** — the frontend never fabricates or derives a plan name. This mirrors
+the Premiums "Policy Name" column behavior exactly. The rest of the card (amount, status
+badge, description, submitted date, actions) is unchanged.
+
 ### Premiums
 
 **View-only** payment history. No actions — ops staff can see premium payments that have
