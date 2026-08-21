@@ -115,8 +115,15 @@ been recorded but do not modify them here.
 The premiums table's **first (left-most) column is "Policy Name"**, populated from the API's
 `policyName` field on each premium (the resolved plan catalog name). When `policyName` is
 `null`, absent, or blank, the cell renders the literal text **"Unknown plan"** — the
-frontend never fabricates or derives a plan name. The remaining columns (Policy ref, Amount,
-Paid at, Sync status) follow unchanged.
+frontend never fabricates or derives a plan name.
+
+As of **VKAI-009 / VJS-48**, the columns are: **Policy Name | Policy ref | Enrolment Date |
+Amount | Paid at**. The **"Enrolment Date"** column sits **before "Amount"** and renders the
+API's `enrolmentDate` field (an ISO date string, or `null`) using the same date formatting as
+"Paid at" (`formatDate`), showing an em-dash **"—"** when it is null/absent. The API handles
+the backfill/fallback for existing records, so the frontend simply renders whatever
+`enrolmentDate` it returns. The former **"Sync status"** column was **removed** in this
+change.
 
 ### Sync Issues
 

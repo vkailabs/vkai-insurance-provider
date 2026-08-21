@@ -41,9 +41,12 @@ export default function PremiumsPage() {
                     client policy it belongs to, plus paidAt. */}
                 <th>Policy Name</th>
                 <th>Policy ref</th>
+                {/* Enrolment Date comes from the API's enrolmentDate (ISO date
+                    string, or null). The API backfills/falls back for existing
+                    records, so the frontend just renders whatever it returns. */}
+                <th>Enrolment Date</th>
                 <th>Amount</th>
                 <th>Paid at</th>
-                <th>Sync status</th>
               </tr>
             </thead>
             <tbody>
@@ -61,9 +64,9 @@ export default function PremiumsPage() {
                         {policyRef || '—'}
                       </code>
                     </td>
+                    <td>{formatDate(row.enrolmentDate)}</td>
                     <td>{formatCurrency(row.amount)}</td>
                     <td>{formatDate(row.paidAt)}</td>
-                    <td>{row.syncStatus || '—'}</td>
                   </tr>
                 );
               })}
