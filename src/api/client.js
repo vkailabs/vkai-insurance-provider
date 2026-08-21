@@ -89,8 +89,19 @@ export const updatePolicy = (id, data) =>
   request(`/v1/policy-catalog/${id}`, { method: 'PATCH', body: data });
 
 // Enrollments (policies)
+// Pending-only fetch — kept for the dashboard's "Pending enrollments" count,
+// whose semantics must stay pending-only.
 export const getPendingEnrollments = () =>
   request('/v1/policies?status=pending');
+// Generic enrollments fetch with an optional status filter (pending | active |
+// expired | cancelled). Omit / pass 'All' for every status. Mirrors getClaims.
+export const getEnrollments = (statusFilter) => {
+  const qs =
+    statusFilter && statusFilter !== 'All'
+      ? `?status=${encodeURIComponent(statusFilter)}`
+      : '';
+  return request(`/v1/policies${qs}`);
+};
 export const activatePolicy = (id) =>
   request(`/v1/policies/${id}/activate`, { method: 'POST' });
 
