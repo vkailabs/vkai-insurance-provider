@@ -93,6 +93,13 @@ The gating is **flexible**: an Approver may approve or reject a claim directly w
 Reviewer having moved it to Under Review first — there is no strict Reviewer-first
 requirement. Each transition is synced back to the client side.
 
+Each claim card shows a color-coded **status badge** (`ClaimStatusBadge`), driven purely by
+CSS class on the claim's status. As of **VKAI-008 / VJS-47**, the **Paid** badge is
+**light green** (`--status-paid: #22c55e`, Tailwind green-500) — kept visually distinct from
+the darker-green **Approved** badge (`--status-approved: #15803d`) and legible against the
+badge's white label text. Because the colour is applied by status class, this covers **all
+existing Paid records** automatically — no data migration.
+
 Each claim is shown as a **card**, and the **top line (heading) of every claim card is the
 Policy Name**, populated from the API's `policyName` field on each claim (the resolved plan
 catalog name). When `policyName` is `null`, absent, or blank, the heading renders the literal
