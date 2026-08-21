@@ -20,6 +20,12 @@
   --status-approved: #15803d;
   --status-rejected: #b91c1c;
   --status-paid: #22c55e;
+
+  /* Enrollment (policy) status colors */
+  --status-pending: #b45309;
+  --status-active: #15803d;
+  --status-expired: #64748b;
+  --status-cancelled: #b91c1c;
 }
 
 * {
@@ -509,6 +515,18 @@ body {
 }
 .badge--paid {
   background: var(--status-paid);
+}
+.badge--pending {
+  background: var(--status-pending);
+}
+.badge--active {
+  background: var(--status-active);
+}
+.badge--expired {
+  background: var(--status-expired);
+}
+.badge--cancelled {
+  background: var(--status-cancelled);
 }
 .badge--default {
   background: #94a3b8;

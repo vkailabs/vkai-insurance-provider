@@ -69,12 +69,32 @@ plan has been saved. In the catalog list the key is shown as a **prefix to the p
 
 ### Enrollments
 
-The **pending-enrollment queue** — enrollment requests that have synced in from the client
-side and are awaiting provider action.
+The **enrollment queue** — enrollment requests that have synced in from the client side.
+An enrollment (policy) has one of four statuses: **pending | active | expired | cancelled**.
 
-- **Both roles:** view the queue.
-- **Approver only:** **activate** an enrollment (the activation is then synced back to the
-  client side).
+- **Both roles:** view enrollments.
+- **Approver only:** **activate** a **pending** enrollment (the activation is then synced
+  back to the client side).
+
+As of **VKAI-010 / VJS-49**, the page has a **Status filter** (Pending / Active / Expired /
+Cancelled / All) mirroring the Claims filter, backed by the API's `?status=` support. The
+**default view is Pending** (preserving the historical pending-queue behavior), and the
+filter value is reflected in the URL query string. Each row shows a color-coded **status
+badge** (`EnrollmentStatusBadge`, reusing the shared `.badge` styling) in a **Status**
+column, so a **cancelled** enrollment is clearly surfaced as **"Cancelled"**.
+
+**Only pending rows offer the Activate action.** For any non-pending row (cancelled, active,
+expired) the Actions cell shows no button — an em-dash "—" instead. This is belt-and-braces
+with the server: `POST /v1/policies/:id/activate` **409s** for any non-pending policy, so a
+**cancelled policy can never be activated** (neither via the UI nor the API). The Approver
+role-gate on Activate for pending rows is unchanged.
+
+**Cancellation origin:** a customer cancels a still-pending policy on the client (GCP) side;
+that cancellation syncs across and sets the mirrored provider policy's `status = 'cancelled'`.
+The provider portal never initiates cancellation — it only surfaces the synced result.
+
+The **Dashboard "Pending enrollments" count stays pending-only** — it uses the dedicated
+pending-only fetch and is unaffected by the Enrollments page filter.
 
 ### Claims
 
